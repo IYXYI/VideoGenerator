@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 
 # Set up your API key
-api_key = 'ac4e95fbca3c4ca6bdabbfb39d047c14'  # Replace 'YOUR_API_KEY' with your actual News API key
+api_key = 'ac4e95fbca3c4ca6bdabbfb39d047c1'  # Replace 'YOUR_API_KEY' with your actual News API key
 
 # Define the base URL for the News API
 base_url = 'https://newsapi.org/v2/everything'
