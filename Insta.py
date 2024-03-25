@@ -7,6 +7,9 @@ def download_last_2_reels(username):
     L = instaloader.Instaloader()
     profile = instaloader.Profile.from_username(L.context, username)
 
+
+
+    #list of reels 
     reels = []
     # Iterate through the last 2 posts
     for post in profile.get_posts():
