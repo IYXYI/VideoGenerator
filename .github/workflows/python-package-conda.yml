@@ -3,7 +3,7 @@ name: Python Package using Conda
 on:
   push:
     paths:
-      - 'VideoGenerator/Insta.py'
+      - 'Insta.py'
 
 jobs:
   build-linux:
