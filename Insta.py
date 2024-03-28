@@ -3,26 +3,20 @@ import instaloader
 import moviepy.editor as mp
 import shutil
 
-
-
-def download_last_2_reels(username):  
+def download_last_2_reels(username, password):
     L = instaloader.Instaloader()
+    L.login(username, password)
+
     profile = instaloader.Profile.from_username(L.context, username)
 
-
-
-    #list of reels 
     reels = []
-    # Iterate through the last 2 posts
     for post in profile.get_posts():
         if len(reels) >= 2:
             break
         if post.is_video and post.typename == 'GraphVideo':
             reels.append(post)
 
-    # Download the reels
     if reels:
-        # Create a folder for reels if it doesn't exist
         folder_path = 'all_reels'
         os.makedirs(folder_path, exist_ok=True)
         for reel in reels:
@@ -32,12 +26,16 @@ def download_last_2_reels(username):
             except FileNotFoundError:
                 print(f"File {reel.shortcode}.mp4 not found.")
 
+# Your Instagram credentials
+your_username = 'testmsn100@gmail.com'
+your_password = 'Azerty1010'
+
 # List of 5 usernames
 usernames = ['chaghab.bdarija', 'amazighia_7orra', 'snapmaroc.officiel1', 'igag_officiel', 'moul.whatsapp']
 
 # Download last 2 reels for each username into one folder
 for username in usernames:
-    download_last_2_reels(username)
+    download_last_2_reels(username, your_password)
 
 # Create a list to store video file paths
 video_files = []
