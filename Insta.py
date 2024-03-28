@@ -3,39 +3,37 @@ import instaloader
 import moviepy.editor as mp
 import shutil
 
-def download_last_2_reels(username, password):
+def download_last_2_reels(username):
     L = instaloader.Instaloader()
-    L.login(username, password)
 
-    profile = instaloader.Profile.from_username(L.context, username)
+    try:
+        profile = instaloader.Profile.from_username(L.context, username)
 
-    reels = []
-    for post in profile.get_posts():
-        if len(reels) >= 2:
-            break
-        if post.is_video and post.typename == 'GraphVideo':
-            reels.append(post)
+        reels = []
+        for post in profile.get_posts():
+            if len(reels) >= 2:
+                break
+            if post.is_video and post.typename == 'GraphVideo':
+                reels.append(post)
 
-    if reels:
-        folder_path = 'all_reels'
-        os.makedirs(folder_path, exist_ok=True)
-        for reel in reels:
-            try:
-                L.download_post(reel, target=folder_path)
-                print(f"Reel {reel.shortcode} downloaded.")
-            except FileNotFoundError:
-                print(f"File {reel.shortcode}.mp4 not found.")
-
-# Your Instagram credentials
-your_username = 'testmsn100@gmail.com'
-your_password = 'Azerty1010'
+        if reels:
+            folder_path = 'all_reels'
+            os.makedirs(folder_path, exist_ok=True)
+            for reel in reels:
+                try:
+                    L.download_post(reel, target=folder_path)
+                    print(f"Reel {reel.shortcode} downloaded.")
+                except FileNotFoundError:
+                    print(f"File {reel.shortcode}.mp4 not found.")
+    except instaloader.exceptions.ProfileNotExistsException:
+        print(f"Profile {username} does not exist.")
 
 # List of 5 usernames
 usernames = ['chaghab.bdarija', 'amazighia_7orra', 'snapmaroc.officiel1', 'igag_officiel', 'moul.whatsapp']
 
 # Download last 2 reels for each username into one folder
 for username in usernames:
-    download_last_2_reels(username, your_password)
+    download_last_2_reels(username)
 
 # Create a list to store video file paths
 video_files = []
