@@ -1,53 +1,37 @@
-import os
-import instaloader
 import moviepy.editor as mp
-import shutil
+from pytube import Search
 
-def download_last_2_reels(username):
-    L = instaloader.Instaloader()
+def download_youtube_videos_with_hashtag(hashtag, max_duration=20, max_videos=2):
+    search_query = f"{hashtag}"
+    search_results = Search(search_query)
 
-    try:
-        profile = instaloader.Profile.from_username(L.context, username)
+    downloaded_videos = []
+    for video in search_results.results[:max_videos]:
+        try:
+            if video.length <= max_duration:
+                downloaded_videos.append(video.streams.get_highest_resolution().download())
+                print(f"Downloaded video: {video.title}")
+        except Exception as e:
+            print(f"Error downloading video: {e}")
 
-        reels = []
-        for post in profile.get_posts():
-            if len(reels) >= 2:
-                break
-            if post.is_video and post.typename == 'GraphVideo':
-                reels.append(post)
+    return downloaded_videos
 
-        if reels:
-            folder_path = 'all_reels'
-            os.makedirs(folder_path, exist_ok=True)
-            for reel in reels:
-                try:
-                    L.download_post(reel, target=folder_path)
-                    print(f"Reel {reel.shortcode} downloaded.")
-                except FileNotFoundError:
-                    print(f"File {reel.shortcode}.mp4 not found.")
-    except instaloader.exceptions.ProfileNotExistsException:
-        print(f"Profile {username} does not exist.")
+hashtag = "happy"
+max_duration = 250
+downloaded_videos = download_youtube_videos_with_hashtag(hashtag, max_duration=max_duration, max_videos=2)
 
-# List of 5 usernames
-usernames = ['chaghab.bdarija', 'amazighia_7orra', 'snapmaroc.officiel1', 'igag_officiel', 'moul.whatsapp']
+if downloaded_videos:
+    # Create montage within the loop (after first download)
+    montage = None  # Initialize montage as None
+    for video_path in downloaded_videos:
+        video_clip = mp.VideoFileClip(video_path)
+        if montage is None:  # Create montage on first iteration
+            montage = mp.CompositeVideoClip([video_clip])
+        else:  # Concatenate subsequent clips
+            montage = mp.concatenate_videoclips([montage, video_clip])
 
-# Download last 2 reels for each username into one folder
-for username in usernames:
-    download_last_2_reels(username)
-
-# Create a list to store video file paths
-video_files = []
-
-# Iterate through 'all_reels' folder and collect video file paths
-folder_path = 'all_reels'
-for filename in os.listdir(folder_path):
-    if filename.endswith('.mp4'):
-        video_files.append(os.path.join(folder_path, filename))
-
-# Create a video using reels from the 'all_reels' folder
-if video_files:
-    clips = [mp.VideoFileClip(video_file) for video_file in video_files]
-    final_clip = mp.concatenate_videoclips(clips)
-    final_clip.write_videofile('output_video.mp4')
+    final_video_path = f"{hashtag}_montage.mp4"
+    montage.write_videofile(final_video_path, fps=24)
+    print(f"Montage video created: {final_video_path}")
 else:
-    print("No video files found in 'all_reels' folder.")
+    print(f"No videos found with hashtag '{hashtag}' and duration less than {max_duration} seconds.")
